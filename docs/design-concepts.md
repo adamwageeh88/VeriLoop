@@ -1,0 +1,61 @@
+# Design choices → module concepts (working notes for the report)
+
+Notes for the Assignment 2 design rationale. Each row links a feature in the
+prototype to the Week 1–4 concept that motivated it and the A1 evidence behind
+it. Trim and reword for the report; this file is not counted.
+
+| Feature in prototype | Concept / guideline (lecture) | How it shaped the decision | A1 evidence |
+|---|---|---|---|
+| Evidence split into **Checked / Failed / Unresolved** bins | Make uncertainty visible: "every inference is a bet" (L02); signal detection — separate quality of evidence from the decision (L04) | A single "tests pass ✓" hides what was not checked. Three bins separate what is known from what is not, so the developer makes the decision, not the pass mark. | A1 gap: developers need evidence *separating tested behaviour, failed checks and unresolved risks*. |
+| **Claims vs evidence** table | Process hallucination — "'Done' is a claim until the tool says so" (L12); fluency is not evidence (L08) | The assistant's prose claims are shown next to what the sandbox actually found, and labelled Supported / Partly / Contradicted. | Cihan et al. (2025): resolved ≠ defect removed. |
+| Verification **starts automatically**; integration **always asks** | Mixed-initiative act / ask / wait rule (Horvitz 1999, L03) | Running checks on an isolated copy is cheap and reversible → act. Integrating into the codebase is costly → ask. Rule is written in `app.js`. | Mehta (2026): controlled integration. |
+| **“Test copy only” label** on the diff; **“Your code: unchanged / 1 change applied”** always visible in the top bar | Gulf of evaluation; visibility of system state (L06, L01 direct manipulation); "state what did not happen" (L12) | The developer can always see whether their real code has changed. | A1: isolation protects the codebase but is not verification. |
+| **Line-coverage caveat** ("executed ≠ behaviour checked") and the discount scenario | Mental models; explanation completeness (Kulesza et al. 2013, L05) | Scenario 1 has 82% coverage and all tests passing, yet a regression. The caveat corrects the wrong model "covered = safe". | A1: specifications and tests can miss requirements. |
+| **"Tests written by the same assistant"** risk | Automation bias, misuse (Parasuraman & Riley 1997; Skitka et al. 1999, L06) | Flags that generated tests are not independent evidence, to avoid repeated automated success creating over-confidence. | Huang et al. (2024): separate roles ≠ independent reasoning. |
+| **Run more tests** (differential tests vs original code) | G10 scope services when in doubt; G11 make clear why (Amershi et al. 2019, L03) | Gives the developer a way to resolve uncertainty rather than only accept/reject. | A1 contribution: feedback should help developers *request more testing*. |
+| **Resolve actions on each unresolved item** (test it, answer the question, ask for a fix, accept the risk with a reason; reopen any time) | Gulf of execution: signifiers show what can be done next (L06); G9 support efficient correction, G15 granular feedback (L03); keep people in control (Shneiderman, L03) | An unresolved label with no action left the developer stuck between applying anyway and rejecting. Answers to requirement questions become evidence, so the person supplies what tests cannot know. Accepted risks stay on record, which avoids silently dismissing them. | A1: tests and specifications can miss requirements; feedback should let developers request more testing or reconsider assumptions. |
+| **Bounded self-revision** setting (0–2 attempts) | Global controls G17 (L03); closed loop | Automatic repair loop (AgentCoder-style), but the person sets how far it goes; each iteration shown in the Verification loop timeline. | Huang et al. (2024); Peng et al. (2025). |
+| **Flaky test** shown as Inconclusive, re-run on baseline | Signal detection: false alarms change responses (L04) | Flaky failures are separated from failures caused by the change, so warnings stay credible. | Mehta (2026): flaky tests. |
+| **Confirmation** only when failed / medium–high risks remain (accepted risks are listed too); **Undo** checkpoints | Slips need constraints/confirmation/undo; mistakes need better feedback (Reason 1990, L06); reversibility (L01, L03 proposal–review–undo) | Confirmation is reserved for risky integrations to avoid alarm fatigue; undo makes every integration reversible. | — |
+| **Progressive disclosure**: verdict → one “Needs attention” list (first item open) → open an item for its source and actions; everything else folded; workspace and menu hidden until asked for | Cognitive load — remove extraneous load (Sweller 1988, L05); provenance (L11) | Summary first; each item expands to its source (test id, command, log) and highlights the diff lines it refers to. | — |
+| **Staged progress** while verifying | Feedback timing 0.1 s / 1 s / 10 s (L04); turn-taking — show system is processing (L07) | Verification takes several seconds, so each stage is shown with elapsed time. | — |
+| **Reject and Apply as an equal pair**; further steps (revise, more tests) as quieter links | Anchoring (Tversky & Kahneman 1974, L06) | No option is styled as the default; the verdict states what needs judgement, not what to do. | — |
+| **"What is checked?"** capability panel | G1/G2 make clear what the system can do and how well (L03); expectation gulf (Luger & Sellen 2016) | States what the pipeline does *not* check (requirements, performance, security). | A1: no claim of complete security or guaranteed regression prevention. |
+| **Simulation banner** | Signifiers; WarGames example — simulation indistinguishable from reality (L06) | The prototype is always visibly marked as simulated. | Assignment: clearly label placeholders. |
+| **Evidence / Baseline views + study log** | — (study design); Baseline avoids signifiers of checking (L05 system image) | Implements the A1 comparison. The Baseline shows no test copy, no checking step and no S markers, so the control condition is a plain assistant. The log records participant, view, decision, time to decide, evidence looked at and appropriateness. | A1 measures: appropriate accept/reject, regression detection, decision time. |
+| **Participant sessions** hide the view switch and log | Study validity | Participants could otherwise see the known answers or switch view. | A1 proposed study. |
+| **“Add free shipping”: every check passes but a bug remains** | Automation bias applied to the checker itself (Parasuraman & Riley 1997; Skitka et al. 1999, L06); signal detection — misses (L04) | Measures whether people over-rely on a green verdict. The verdict explanation says “Low risk is not proof”. | A1: whether repeated automated success creates excessive confidence. |
+| **Assistant declines and asks** (“Speed up product search”) | L07 decline and clarify turns; G1/G2 capability and reliability; G10 scope when in doubt | The assistant says speed cannot be checked, offers what can be checked, and returns control. The unmeasured speed-up stays visible as an unresolved item and its claim is marked “Not checked”. | A1: evidence separating checked behaviour from uncertainty. |
+| **Checks could not run** (“Upgrade the payment library”) | L08: what users see when the capability fails; L12: report from the tool's return value | No evidence is shown as no evidence, not as success. The person can re-run, reject or apply with a strong confirmation. | A1: isolation is not verification. |
+| **Rules you've set**, shown inline in the checks panel and in the “Your code” pop-over | L10 memory: inspectable, editable, forgettable; show what is held, in the person's words, when it is used | Answers to requirement questions are kept as rules, shown in the sidebar with when and where they were set, sent with later requests (and shown being sent), reused to answer the same question, changed in one action, and forgotten together with the answers derived from them. | A1: tests can miss requirements only the developer knows. |
+| **Stop** the assistant, the checks or an automatic retry | L07 turn-taking (holding the floor); G9 efficient correction; L02 “see, stop or correct” | The system never holds the floor without a way to take the turn back. Stopped checks produce “no results”, not a verdict. | — |
+| **“Why this verdict?”** and severity descriptions | G11 make clear why; L06 anchoring | The rule behind each verdict is stated; the verdict is derived from results, not from the assistant's claims. | — |
+
+| **Settings page** (appearance, accessibility, reading, checks, keyboard) | G17 global controls (Amershi et al. 2019, L03); human control (Shneiderman 2022) | The person decides how the system looks and how far it acts on its own. Changes apply at once so their effect is visible (G16). | — |
+| **“Run checks automatically” switch** | Initiative rule made adjustable (Horvitz 1999, L03): act or wait | When off, the system waits and shows “Not checked yet”; it never treats untested code as checked. | — |
+| **No single-key Apply/Reject shortcut** | Slips need constraints (Reason 1990; Norman 2013, L06) | A stray key cannot change the person's code; navigation shortcuts only. | — |
+| **Screen-reader announcements** when checks finish or a decision is made | Feedback must reach attention (L04); multiple channels | Results that appear in another part of the screen are also announced, without reading out the whole panel. | — |
+| **Colour-blind-safe palette, high contrast, text size, reduced motion** | Perception and attention (L04): a cue must be noticed to work | Status never relies on colour alone (icons too); the person can tune contrast, size and motion to their needs. | — |
+
+| **“What changed in your code”** view for each applied change, and “View all changes” | Provenance (L11); gulf of evaluation (L06); reversibility with visible consequences (G16, L03) | Undo alone says nothing about what will be reversed. The view shows the exact change and the evidence it was applied on, including problems that were still open and risks the person accepted, so a later reader can judge the decision. | A1: developers need evidence to judge AI changes, not only a pass mark. |
+
+## Study-validity safeguards (for the evaluation section)
+
+| Safeguard | Threat it addresses |
+|---|---|
+| Practice task first, not analysed | Learning the interface during the first measured task |
+| Task order shuffled per participant ID, reproducible | Order and fatigue effects |
+| Same briefing for both views except one sentence | Instructions differing between conditions |
+| Behaviour settings (automatic checks, retries, confirmation, open all items) fixed during sessions; appearance and accessibility left to the participant; demo speed hidden | Different system behaviour between participants, without taking away accessibility |
+| Revision only fixes “Add free shipping” if the feedback names the problem | The simulation fixing a bug the participant never spotted |
+| Pre-filled revision text describes the problem, not the fix | The system handing participants the solution |
+| One task at a time; no “Try this task again” in sessions | Repeating a task after seeing the answer |
+| Final decision per task accounts for undo | Counting a decision the participant reversed |
+| Raw NASA-TLX after each task (Hart & Staveland, 1988) | Missing the workload measure proposed in A1 |
+| Autosave and restore | Losing data on an accidental reload |
+
+## Implemented / simulated / planned (for the system diagram)
+
+- **Implemented:** UI, interaction flow, initiative rule (act / ask / decline), resolve actions, rules you've set, stop controls, verdict explanation, settings, undo checkpoints, Evidence/Baseline views, participant sessions, study log and JSON export.
+- **Simulated (scripted):** LLM code assistant and its revisions, sandbox copy, test runner, test generation, differential testing, call-graph analysis, flaky-test re-runs, test-area failure.
+- **Planned:** real LLM call with structured (JSON-schema) output for claims; real sandbox (e.g. container) running `pytest`; free-text requests; re-checking evidence when the codebase changes; undo that warns about dependent changes.
