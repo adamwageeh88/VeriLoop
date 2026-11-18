@@ -49,6 +49,7 @@ Then open http://localhost:8000.
 ## Development record
  
 Commits: [commit history](https://github.com/adamwageeh88/VeriLoop/commits/main)
+
 Note: the prototype was built locally and uploaded to GitHub once it was finished, so the commit history does not show the stages below. This table is the record of how the work developed; later fixes are committed separately.
  
 | Stage | Date | Change | Why | Checked |
